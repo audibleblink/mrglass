@@ -76,8 +76,10 @@ func correlate(crackScanner *bufio.Scanner, users *os.File) {
 		line := crackScanner.Text()
 		hashAndPass := strings.SplitN(line, ":", 2)
 		hash, pass := hashAndPass[0], hashAndPass[1]
-		user := userHash[hash]
-		fmt.Printf("%s:%s\n", user, pass)
+		users := userHash[hash]
+		for _, user := range users {
+			fmt.Printf("%s:%s\n", user, pass)
+		}
 	}
 }
 
@@ -92,13 +94,13 @@ func hasPipe() bool {
 
 // loadHashMap puts in memory a map of password hashes with usernames
 // as the values for easy retreival
-func loadHashMap(hashes *os.File) (userHash map[string]string) {
+func loadHashMap(hashes *os.File) (userHash map[string][]string) {
 	scanner := bufio.NewScanner(hashes)
-	userHash = make(map[string]string)
+	userHash = make(map[string][]string)
 	for scanner.Scan() {
 		userAndHash := strings.SplitN(scanner.Text(), ":", 2)
 		user, hash := userAndHash[0], userAndHash[1]
-		userHash[hash] = user
+		userHash[hash] = append(userHash[hash], user)
 	}
 	return userHash
 }
