@@ -14,11 +14,12 @@ Usage:
 
 	<CRACKED> | mrglass <USERHASH> 
 
-	mrglass takes USERHASH as a newline-seperated file in the
-	the format of 'USER:HASH'
+	USERHASH is a newline-seperated file in the the format of 
+	'USER:HASH'
 
-	mrglass takes CRACKED as a newline-seperated file or 
-	pipe whose entries are in the the format of 'HASH:PLAINTEXT'
+	CRACKED is a newline-seperated file or pipe whose entries 
+	are in the the format of 
+	'HASH:PLAINTEXT_PASSWORD'
 
 Examples:
 	mrglass hashes_with_usernames.txt cracked.txt
@@ -75,6 +76,10 @@ func correlate(crackScanner *bufio.Scanner, users *os.File) {
 	for crackScanner.Scan() {
 		line := crackScanner.Text()
 		hashAndPass := strings.SplitN(line, ":", 2)
+		if len(hashAndPass) != 2 {
+			fmt.Fprintln(os.Stderr, "<CRACKED>: bad format")
+			continue
+		}
 		hash, pass := hashAndPass[0], hashAndPass[1]
 		users := userHash[hash]
 		for _, user := range users {
@@ -99,6 +104,10 @@ func loadHashMap(hashes *os.File) (userHash map[string][]string) {
 	userHash = make(map[string][]string)
 	for scanner.Scan() {
 		userAndHash := strings.SplitN(scanner.Text(), ":", 2)
+		if len(userAndHash) != 2 {
+			fmt.Fprintln(os.Stderr, "<USERHASH>: bad format")
+			continue
+		}
 		user, hash := userAndHash[0], userAndHash[1]
 		userHash[hash] = append(userHash[hash], user)
 	}
