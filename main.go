@@ -115,6 +115,6 @@ func loadHashMap(hashes *os.File) (userHash map[string][]string) {
 }
 
 func bail(err error) {
-	fmt.Println(err.Error())
+	fmt.Fprintln(os.Stderr, err.Error())
 	help()
 }
