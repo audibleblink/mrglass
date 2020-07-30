@@ -21,7 +21,10 @@ jobs:
 
       - name: Bump version and push tag
         id: next_version
-        uses: mathieudutour/github-tag-action@v4.5
+        uses: anothrNick/github-tag-action@1.20.0
+        env:
+          WITH_V: true
+          DEFAULT_BUMP: patch
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
