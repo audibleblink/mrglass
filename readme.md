@@ -1,6 +1,6 @@
 # mrglass
 
-small util program to correlate hashstack output with usernames
+a small utility program to correlate hashstack output with usernames
 
 ```
 Usage: 
