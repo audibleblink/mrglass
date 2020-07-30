@@ -1,24 +1,21 @@
-GOX := $(GOPATH)/bin/gox
-
+APP = mrglass
 DIR = release
-OUT = ${DIR}/{{.OS}}_{{.Arch}}
 
-LDFLAGS = -ldflags="-s -w -buildid="
-OSARCH ?= "linux/amd64 linux/arm windows/amd64 darwin/amd64"
-THREADS ?= 4
+FLAGS = -trimpath -ldflags="-s -w -buildid="
+PLATFORMS ?= linux windows darwin
 
-all: $(GOX) 
-	$(eval export GOFLAGS=-trimpath)
-	gox -verbose -parallel ${THREADS} -osarch ${OSARCH} ${LDFLAGS} -output ${OUT}
+os=$(word 1, $@)
 
-release: all
+all: ${PLATFORMS}
+
+release: ${PLATFORMS}
 	@tar caf release.tar.gz ${DIR}
 	@rm -rf release
 
+${PLATFORMS}:
+	GOOS=${os} go build ${FLAGS} -o ${DIR}/${APP}-${os} 
+
 clean: 
-	rm -rf ${DIR} release.tar.gz
+	rm -rf ${DIR}*
 
-$(GOX):
-	go get -u github.com/mitchellh/gox
-
-.PHONY: all clean release
+.PHONY: clean release
