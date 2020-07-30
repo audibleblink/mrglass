@@ -5,6 +5,7 @@ OUT = ${DIR}/{{.OS}}_{{.Arch}}
 
 LDFLAGS = -ldflags="-s -w -buildid="
 OSARCH ?= "linux/amd64 linux/arm windows/amd64 darwin/amd64"
+THREADS ?= 4
 
 release: all
 	@tar caf release.tar.gz ${DIR}
