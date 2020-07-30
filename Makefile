@@ -18,6 +18,6 @@ clean:
 	rm -rf ${DIR} release.tar.gz
 
 $(GOX):
-	go get -u github.com/audibleblink/gox
+	go get -u github.com/mitchellh/gox
 
 .PHONY: all clean release
