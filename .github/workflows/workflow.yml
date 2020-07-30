@@ -24,6 +24,7 @@ jobs:
         uses: anothrNick/github-tag-action@1.20.0
         env:
           WITH_V: true
+          RELEASE_BRANCHES: main
           DEFAULT_BUMP: patch
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
