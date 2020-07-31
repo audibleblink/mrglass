@@ -1,23 +1,21 @@
+name: 'Release Builds'
+
 on:
   push:
     tags:
       - 'v*'
 
-name: Build and Release
-
 jobs:
 
   release:
+    name: 'Create Release from Tag'
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
 
       - name: Checkout
         uses: actions/checkout@master
-
-      - name: Build
-        uses: audibleblink/golang-action@1.5.3
-        with:
-          args: make release -j4
 
       - name: Get the version
         id: get_version
@@ -34,13 +32,35 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+  build:
+    name: 'Build & Upload ${{ matrix.OSes }} Release'
+    runs-on: ubuntu-latest
+    needs: release
+    strategy:
+      matrix:
+        OSes: ['windows', 'darwin', 'linux']
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+
+      - name: 'Setup Golang Environment'
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.14'
+
+      - name: 'Build ${{ matrix.OSes }} binary'
+        run: |
+          GOOS=${{ matrix.OSes }} \
+          go build -o mrglass_${{ matrix.OSes }}
+
+      - name: 'Upload Release Assets'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release.tar.gz
-          asset_name: mrglass.tar.gz
-          asset_content_type: application/zip
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./mrglass_${{ matrix.OSes }}
+          asset_name: mrglass_${{ matrix.OSes }}
+          asset_content_type: application/octet-stream
 
